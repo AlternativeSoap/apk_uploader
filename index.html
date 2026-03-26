@@ -39,7 +39,6 @@
       font-size: 0.95rem;
     }
 
-    /* Upload area */
     .upload-zone {
       border: 2px dashed #333;
       border-radius: 16px;
@@ -48,7 +47,6 @@
       cursor: pointer;
       transition: all 0.3s;
       background: #161625;
-      position: relative;
     }
 
     .upload-zone:hover, .upload-zone.dragover {
@@ -56,25 +54,10 @@
       background: #1a1a30;
     }
 
-    .upload-zone .icon {
-      font-size: 48px;
-      margin-bottom: 12px;
-    }
-
-    .upload-zone p {
-      color: #aaa;
-      font-size: 1rem;
-    }
-
-    .upload-zone .browse {
-      color: #00c6ff;
-      text-decoration: underline;
-      cursor: pointer;
-    }
-
-    .upload-zone input[type="file"] {
-      display: none;
-    }
+    .upload-zone .icon { font-size: 48px; margin-bottom: 12px; }
+    .upload-zone p { color: #aaa; font-size: 1rem; }
+    .upload-zone .browse { color: #00c6ff; text-decoration: underline; cursor: pointer; }
+    .upload-zone input[type="file"] { display: none; }
 
     .file-info {
       display: none;
@@ -84,11 +67,9 @@
       border-radius: 10px;
       font-size: 0.9rem;
     }
-
     .file-info .name { color: #fff; font-weight: 600; }
     .file-info .size { color: #888; margin-left: 8px; }
 
-    /* Progress bar */
     .progress-wrap {
       display: none;
       margin-top: 20px;
@@ -114,7 +95,6 @@
       color: #888;
     }
 
-    /* Upload button */
     .upload-btn {
       display: none;
       width: 100%;
@@ -129,11 +109,9 @@
       color: #fff;
       transition: opacity 0.2s;
     }
-
     .upload-btn:hover { opacity: 0.9; }
     .upload-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-    /* Result section */
     .result {
       display: none;
       margin-top: 28px;
@@ -144,11 +122,7 @@
       text-align: center;
     }
 
-    .result h2 {
-      font-size: 1.2rem;
-      margin-bottom: 16px;
-      color: #4cff8b;
-    }
+    .result h2 { font-size: 1.2rem; margin-bottom: 16px; color: #4cff8b; }
 
     .result .qr-code {
       margin: 16px auto;
@@ -158,11 +132,7 @@
       display: inline-block;
     }
 
-    .result .qr-code img {
-      display: block;
-      width: 240px;
-      height: 240px;
-    }
+    .result .qr-code canvas { display: block; }
 
     .link-box {
       display: flex;
@@ -192,14 +162,9 @@
       white-space: nowrap;
       transition: opacity 0.2s;
     }
-
     .link-box button:hover { opacity: 0.85; }
 
-    .result .hint {
-      margin-top: 14px;
-      font-size: 0.82rem;
-      color: #777;
-    }
+    .result .hint { margin-top: 14px; font-size: 0.82rem; color: #777; }
 
     .new-upload-btn {
       margin-top: 18px;
@@ -212,10 +177,8 @@
       font-size: 0.9rem;
       transition: border-color 0.2s;
     }
-
     .new-upload-btn:hover { border-color: #00c6ff; color: #fff; }
 
-    /* Error */
     .error-msg {
       display: none;
       margin-top: 16px;
@@ -237,7 +200,7 @@
     <div class="upload-zone" id="dropZone">
       <div class="icon">☁️</div>
       <p>Drag & drop your <strong>.apk</strong> file here</p>
-      <p>or <span class="browse" id="browseBtn">browse files</span></p>
+      <p>or <span class="browse">browse files</span></p>
       <input type="file" id="fileInput" accept=".apk">
     </div>
 
@@ -260,7 +223,7 @@
       <p style="color:#ccc; font-size:0.95rem;" id="resultFileName"></p>
 
       <div class="qr-code" id="qrWrap">
-        <img id="qrImage" src="" alt="QR Code">
+        <canvas id="qrCanvas"></canvas>
       </div>
       <p class="hint">Scan this QR code on your phone to download & install</p>
 
@@ -279,13 +242,19 @@
     </div>
   </div>
 
+  <!-- All client-side: Supabase + QR code via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <script src="config.js"></script>
   <script>
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const BUCKET = 'apk-uploads';
+
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('fileInput');
-    const browseBtn = document.getElementById('browseBtn');
     const fileInfo = document.getElementById('fileInfo');
-    const fileName = document.getElementById('fileName');
-    const fileSize = document.getElementById('fileSize');
+    const fileNameEl = document.getElementById('fileName');
+    const fileSizeEl = document.getElementById('fileSize');
     const uploadBtn = document.getElementById('uploadBtn');
     const progressWrap = document.getElementById('progressWrap');
     const progressBar = document.getElementById('progressBar');
@@ -301,10 +270,8 @@
     dropZone.addEventListener('drop', (e) => {
       e.preventDefault();
       dropZone.classList.remove('dragover');
-      const file = e.dataTransfer.files[0];
-      if (file) selectFile(file);
+      if (e.dataTransfer.files[0]) selectFile(e.dataTransfer.files[0]);
     });
-
     dropZone.addEventListener('click', () => fileInput.click());
     fileInput.addEventListener('change', () => { if (fileInput.files[0]) selectFile(fileInput.files[0]); });
 
@@ -314,8 +281,8 @@
         return;
       }
       selectedFile = file;
-      fileName.textContent = file.name;
-      fileSize.textContent = formatSize(file.size);
+      fileNameEl.textContent = file.name;
+      fileSizeEl.textContent = formatSize(file.size);
       fileInfo.style.display = 'block';
       uploadBtn.style.display = 'block';
       errorMsg.style.display = 'none';
@@ -333,7 +300,7 @@
       errorMsg.style.display = 'block';
     }
 
-    // Upload
+    // Upload directly to Supabase Storage
     uploadBtn.addEventListener('click', async () => {
       if (!selectedFile) return;
 
@@ -341,57 +308,78 @@
       progressWrap.style.display = 'block';
       progressText.style.display = 'block';
       errorMsg.style.display = 'none';
-      progressBar.style.width = '0%';
 
-      const formData = new FormData();
-      formData.append('apkFile', selectedFile);
+      progressBar.style.width = '20%';
+      progressText.textContent = 'Uploading to cloud...';
 
-      const xhr = new XMLHttpRequest();
-      xhr.open('POST', '/upload');
+      try {
+        const sanitized = selectedFile.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+        const storagePath = Date.now() + '-' + sanitized;
 
-      xhr.upload.addEventListener('progress', (e) => {
-        if (e.lengthComputable) {
-          const pct = Math.round((e.loaded / e.total) * 100);
-          progressBar.style.width = pct + '%';
-          progressText.textContent = `Uploading... ${pct}% (${formatSize(e.loaded)} / ${formatSize(e.total)})`;
-        }
-      });
+        const { error: uploadError } = await sb.storage
+          .from(BUCKET)
+          .upload(storagePath, selectedFile, {
+            contentType: 'application/vnd.android.package-archive',
+            upsert: false
+          });
 
-      xhr.onload = async () => {
-        if (xhr.status === 200) {
-          const data = JSON.parse(xhr.responseText);
-          progressText.textContent = 'Upload complete!';
-          await showResult(data);
-        } else {
-          let msg = 'Upload failed';
-          try { msg = JSON.parse(xhr.responseText).error; } catch {}
-          showError(msg);
+        if (uploadError) {
+          showError('Upload failed: ' + uploadError.message);
           uploadBtn.disabled = false;
+          progressWrap.style.display = 'none';
+          progressText.style.display = 'none';
+          return;
         }
-      };
 
-      xhr.onerror = () => {
-        showError('Network error — is the server running?');
+        progressBar.style.width = '75%';
+        progressText.textContent = 'Getting download link...';
+
+        // Public URL from Supabase
+        const { data: urlData } = sb.storage
+          .from(BUCKET)
+          .getPublicUrl(storagePath);
+
+        const publicUrl = urlData.publicUrl;
+
+        // Save metadata
+        await sb.from('apk_uploads').insert({
+          original_name: selectedFile.name,
+          storage_path: storagePath,
+          file_size: selectedFile.size,
+          download_url: publicUrl
+        });
+
+        progressBar.style.width = '100%';
+        progressText.textContent = 'Upload complete!';
+
+        await showResult({
+          filename: selectedFile.name,
+          size: selectedFile.size,
+          downloadUrl: publicUrl
+        });
+
+      } catch (e) {
+        showError('Error: ' + e.message);
         uploadBtn.disabled = false;
-      };
-
-      xhr.send(formData);
+      }
     });
 
     async function showResult(data) {
-      const baseUrl = window.location.origin;
-      const pageLink = baseUrl + data.downloadPageUrl;
-      // directLink is now a full Supabase public URL
+      const base = window.location.href.replace(/\/[^/]*$/, '');
+      const pageLink = base + '/download.html?url=' + encodeURIComponent(data.downloadUrl)
+        + '&name=' + encodeURIComponent(data.filename)
+        + '&size=' + data.size;
 
       document.getElementById('resultFileName').textContent = data.filename + ' (' + formatSize(data.size) + ')';
       document.getElementById('linkInput').value = pageLink;
       document.getElementById('directLinkInput').value = data.downloadUrl;
 
-      // Generate QR code for the direct Supabase download URL (works from anywhere)
+      // QR code generated entirely client-side
       try {
-        const qrRes = await fetch('/qr?url=' + encodeURIComponent(data.downloadUrl));
-        const qrData = await qrRes.json();
-        document.getElementById('qrImage').src = qrData.qr;
+        await QRCode.toCanvas(document.getElementById('qrCanvas'), data.downloadUrl, {
+          width: 240, margin: 2,
+          color: { dark: '#000000', light: '#ffffff' }
+        });
       } catch {
         document.getElementById('qrWrap').style.display = 'none';
       }
@@ -412,7 +400,7 @@
       });
     }
 
-    // New upload
+    // Reset
     document.getElementById('newUploadBtn').addEventListener('click', () => {
       selectedFile = null;
       fileInput.value = '';
