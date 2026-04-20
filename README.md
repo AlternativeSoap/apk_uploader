@@ -1,21 +1,22 @@
 # APK Uploader
 
-Upload APK files and instantly get a download link + QR code.  
-Phones scan the QR → download → install. That simple.
+Drop an APK → get a QR code → anyone scans it → instant install.  
+The latest uploaded APK is always the one people download. One QR to rule them all.
 
 ## 🌐 Live Site
 
-**[https://alternativesoap.github.io/apk_uploader/](https://alternativesoap.github.io/apk_uploader/)**
+- **Upload page:** [https://alternativesoap.github.io/apk_uploader/](https://alternativesoap.github.io/apk_uploader/)
+- **Download page (QR target):** [https://alternativesoap.github.io/apk_uploader/download.html](https://alternativesoap.github.io/apk_uploader/download.html)
 
 ## How it works
 
-1. Open the site above
-2. Drag & drop your `.apk` file (or click to browse)
-3. File uploads to Supabase cloud storage
-4. You get a **QR code** + **direct download link**
-5. Scan QR on any phone → downloads & installs the APK
+1. Open the upload page
+2. Drop your `.apk` file — it uploads instantly (no extra buttons)
+3. A QR code appears pointing to the download page
+4. Show the QR to anyone — they scan it and the APK auto-downloads
+5. Upload a new APK anytime — the same QR now serves the new file
 
-No server needed — everything runs client-side via GitHub Pages + Supabase.
+The QR code URL never changes. It always fetches the latest APK from Supabase.
 
 ## Setup (one-time)
 
@@ -67,12 +68,10 @@ const SUPABASE_ANON_KEY = 'your-anon-key-here';
 
 Go to **repo Settings → Pages → Source: Deploy from a branch → Branch: `main` / `/ (root)`** → Save.
 
-Your site will be live at `https://alternativesoap.github.io/apk_uploader/`
-
 ## Files
 
 | File | Purpose |
 |------|---------|
-| `index.html` | Upload page — drag & drop, upload to Supabase, shows QR |
-| `download.html` | Mobile download page — users land here from QR code |
+| `index.html` | Upload page — drop APK, auto-uploads, shows QR code |
+| `download.html` | Download page — fetches latest APK from Supabase, auto-downloads |
 | `config.js` | Your Supabase URL + anon key (edit this) |

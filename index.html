@@ -9,7 +9,7 @@
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #0f0f1a;
+      background: #0a0a14;
       color: #e0e0e0;
       min-height: 100vh;
       display: flex;
@@ -19,14 +19,14 @@
 
     .container {
       width: 100%;
-      max-width: 560px;
+      max-width: 520px;
       padding: 20px;
     }
 
     h1 {
       text-align: center;
-      font-size: 2rem;
-      margin-bottom: 8px;
+      font-size: 1.8rem;
+      margin-bottom: 4px;
       background: linear-gradient(135deg, #00c6ff, #0072ff);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -34,125 +34,140 @@
 
     .subtitle {
       text-align: center;
-      color: #888;
-      margin-bottom: 32px;
-      font-size: 0.95rem;
+      color: #666;
+      margin-bottom: 28px;
+      font-size: 0.88rem;
     }
 
+    /* Current APK banner */
+    .current-apk {
+      display: none;
+      margin-bottom: 20px;
+      padding: 14px 18px;
+      background: #121a2e;
+      border: 1px solid #1a3050;
+      border-radius: 12px;
+    }
+    .current-apk .label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #4cff8b;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .current-apk .name { color: #ddd; font-weight: 600; font-size: 0.92rem; }
+    .current-apk .meta { color: #667; font-size: 0.8rem; margin-top: 2px; }
+
+    /* Upload zone */
     .upload-zone {
-      border: 2px dashed #333;
+      border: 2px dashed #282840;
       border-radius: 16px;
-      padding: 48px 24px;
+      padding: 40px 24px;
       text-align: center;
       cursor: pointer;
-      transition: all 0.3s;
-      background: #161625;
+      transition: all 0.25s;
+      background: #111120;
     }
-
     .upload-zone:hover, .upload-zone.dragover {
       border-color: #0072ff;
-      background: #1a1a30;
+      background: #141428;
     }
-
-    .upload-zone .icon { font-size: 48px; margin-bottom: 12px; }
-    .upload-zone p { color: #aaa; font-size: 1rem; }
+    .upload-zone.uploading {
+      pointer-events: none;
+      opacity: 0.6;
+    }
+    .upload-zone .icon { font-size: 40px; margin-bottom: 10px; }
+    .upload-zone p { color: #888; font-size: 0.92rem; }
     .upload-zone .browse { color: #00c6ff; text-decoration: underline; cursor: pointer; }
     .upload-zone input[type="file"] { display: none; }
 
-    .file-info {
-      display: none;
-      margin-top: 16px;
-      padding: 12px 16px;
-      background: #1e1e32;
-      border-radius: 10px;
-      font-size: 0.9rem;
-    }
-    .file-info .name { color: #fff; font-weight: 600; }
-    .file-info .size { color: #888; margin-left: 8px; }
-
+    /* Progress */
     .progress-wrap {
       display: none;
-      margin-top: 20px;
-      background: #1e1e32;
-      border-radius: 10px;
+      margin-top: 16px;
+      background: #1a1a2e;
+      border-radius: 8px;
       overflow: hidden;
-      height: 8px;
+      height: 6px;
     }
-
     .progress-bar {
       height: 100%;
       width: 0%;
       background: linear-gradient(90deg, #00c6ff, #0072ff);
-      transition: width 0.2s;
-      border-radius: 10px;
+      transition: width 0.3s ease;
+      border-radius: 8px;
     }
-
     .progress-text {
       display: none;
       text-align: center;
       margin-top: 8px;
+      font-size: 0.82rem;
+      color: #667;
+    }
+
+    .error-msg {
+      display: none;
+      margin-top: 14px;
+      padding: 10px 14px;
+      background: #1e0e18;
+      border: 1px solid #ff4060;
+      border-radius: 10px;
+      color: #ff6080;
       font-size: 0.85rem;
-      color: #888;
-    }
-
-    .upload-btn {
-      display: none;
-      width: 100%;
-      margin-top: 20px;
-      padding: 14px;
-      font-size: 1.05rem;
-      font-weight: 600;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      background: linear-gradient(135deg, #00c6ff, #0072ff);
-      color: #fff;
-      transition: opacity 0.2s;
-    }
-    .upload-btn:hover { opacity: 0.9; }
-    .upload-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-    .result {
-      display: none;
-      margin-top: 28px;
-      padding: 24px;
-      background: #161625;
-      border-radius: 16px;
-      border: 1px solid #2a2a40;
       text-align: center;
     }
 
-    .result h2 { font-size: 1.2rem; margin-bottom: 16px; color: #4cff8b; }
-
+    /* QR Result */
+    .result {
+      display: none;
+      margin-top: 24px;
+      padding: 28px 20px;
+      background: #111120;
+      border-radius: 16px;
+      border: 1px solid #1e1e36;
+      text-align: center;
+    }
+    .result h2 {
+      font-size: 1.1rem;
+      margin-bottom: 4px;
+      color: #4cff8b;
+    }
+    .result .file-label {
+      color: #999;
+      font-size: 0.85rem;
+      margin-bottom: 18px;
+    }
     .result .qr-code {
-      margin: 16px auto;
+      margin: 0 auto 16px;
       background: #fff;
       border-radius: 12px;
-      padding: 12px;
+      padding: 14px;
       display: inline-block;
     }
-
     .result .qr-code canvas { display: block; }
+    .result .scan-hint {
+      font-size: 0.88rem;
+      color: #aaa;
+      margin-bottom: 16px;
+    }
 
     .link-box {
       display: flex;
-      margin-top: 16px;
       gap: 8px;
     }
-
     .link-box input {
       flex: 1;
-      padding: 10px 14px;
-      background: #1e1e32;
-      border: 1px solid #333;
+      padding: 10px 12px;
+      background: #1a1a2e;
+      border: 1px solid #282840;
       border-radius: 10px;
-      color: #fff;
-      font-size: 0.85rem;
+      color: #ccc;
+      font-size: 0.82rem;
       outline: none;
     }
-
     .link-box button {
-      padding: 10px 18px;
+      padding: 10px 16px;
       background: #0072ff;
       border: none;
       border-radius: 10px;
@@ -160,53 +175,63 @@
       font-weight: 600;
       cursor: pointer;
       white-space: nowrap;
+      font-size: 0.82rem;
       transition: opacity 0.2s;
     }
     .link-box button:hover { opacity: 0.85; }
 
-    .result .hint { margin-top: 14px; font-size: 0.82rem; color: #777; }
-
-    .new-upload-btn {
-      margin-top: 18px;
-      padding: 10px 28px;
+    .replace-btn {
+      margin-top: 20px;
+      padding: 10px 24px;
       background: transparent;
-      border: 1px solid #444;
+      border: 1px solid #333;
       border-radius: 10px;
-      color: #ccc;
+      color: #aaa;
       cursor: pointer;
-      font-size: 0.9rem;
-      transition: border-color 0.2s;
+      font-size: 0.85rem;
+      transition: all 0.2s;
     }
-    .new-upload-btn:hover { border-color: #00c6ff; color: #fff; }
+    .replace-btn:hover { border-color: #00c6ff; color: #fff; }
 
-    .error-msg {
+    .loading-spinner {
       display: none;
-      margin-top: 16px;
-      padding: 12px;
-      background: #2a1020;
-      border: 1px solid #ff4060;
-      border-radius: 10px;
-      color: #ff6080;
-      font-size: 0.9rem;
       text-align: center;
+      padding: 20px;
+      color: #667;
+      font-size: 0.88rem;
     }
+    .loading-spinner::before {
+      content: '';
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 2px solid #333;
+      border-top-color: #00c6ff;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>📦 APK Uploader</h1>
-    <p class="subtitle">Upload an APK and get a download link + QR code</p>
+    <p class="subtitle">Drop an APK — get a QR code — scan to install</p>
+
+    <div class="loading-spinner" id="loadingSpinner">Checking for current APK...</div>
+
+    <div class="current-apk" id="currentApk">
+      <div class="label">Current APK</div>
+      <div class="name" id="currentName"></div>
+      <div class="meta" id="currentMeta"></div>
+    </div>
 
     <div class="upload-zone" id="dropZone">
       <div class="icon">☁️</div>
-      <p>Drag & drop your <strong>.apk</strong> file here</p>
-      <p>or <span class="browse">browse files</span></p>
+      <p>Drop your <strong>.apk</strong> here or <span class="browse">browse</span></p>
       <input type="file" id="fileInput" accept=".apk">
-    </div>
-
-    <div class="file-info" id="fileInfo">
-      <span class="name" id="fileName"></span>
-      <span class="size" id="fileSize"></span>
     </div>
 
     <div class="progress-wrap" id="progressWrap">
@@ -216,33 +241,24 @@
 
     <div class="error-msg" id="errorMsg"></div>
 
-    <button class="upload-btn" id="uploadBtn">Upload APK</button>
-
     <div class="result" id="result">
-      <h2>✅ Upload Complete!</h2>
-      <p style="color:#ccc; font-size:0.95rem;" id="resultFileName"></p>
+      <h2 id="resultTitle">✅ Ready to share</h2>
+      <p class="file-label" id="resultFileName"></p>
 
       <div class="qr-code" id="qrWrap">
         <canvas id="qrCanvas"></canvas>
       </div>
-      <p class="hint">Scan this QR code on your phone to download & install</p>
+      <p class="scan-hint">Scan to download &amp; install the APK</p>
 
       <div class="link-box">
         <input type="text" id="linkInput" readonly>
         <button id="copyBtn">Copy</button>
       </div>
 
-      <div class="link-box" style="margin-top: 8px;">
-        <input type="text" id="directLinkInput" readonly>
-        <button id="copyDirectBtn">Copy</button>
-      </div>
-      <p class="hint">Top: download page link &nbsp;|&nbsp; Bottom: direct APK link</p>
-
-      <button class="new-upload-btn" id="newUploadBtn">Upload another</button>
+      <button class="replace-btn" id="replaceBtn">Replace with new APK</button>
     </div>
   </div>
 
-  <!-- All client-side: Supabase + QR code via CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
   <script src="config.js"></script>
@@ -252,41 +268,171 @@
 
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('fileInput');
-    const fileInfo = document.getElementById('fileInfo');
-    const fileNameEl = document.getElementById('fileName');
-    const fileSizeEl = document.getElementById('fileSize');
-    const uploadBtn = document.getElementById('uploadBtn');
     const progressWrap = document.getElementById('progressWrap');
     const progressBar = document.getElementById('progressBar');
     const progressText = document.getElementById('progressText');
     const errorMsg = document.getElementById('errorMsg');
     const result = document.getElementById('result');
+    const loadingSpinner = document.getElementById('loadingSpinner');
 
-    let selectedFile = null;
+    // The download page URL (always the same — it fetches the latest APK)
+    const downloadPageUrl = window.location.href.replace(/\/[^/]*$/, '') + '/download.html';
 
-    // Drag & drop
+    // ── On page load: check if there's already an APK ──
+    (async function init() {
+      loadingSpinner.style.display = 'block';
+      try {
+        const { data, error } = await sb
+          .from('apk_uploads')
+          .select('original_name, file_size, created_at, download_url')
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single();
+
+        if (data && !error) {
+          showCurrentApk(data);
+          await showQR(data.original_name, data.file_size, data.download_url);
+        }
+      } catch (_) { /* no current APK — that's fine */ }
+      loadingSpinner.style.display = 'none';
+    })();
+
+    function showCurrentApk(data) {
+      document.getElementById('currentName').textContent = data.original_name;
+      const mb = (data.file_size / 1048576).toFixed(1);
+      const date = new Date(data.created_at).toLocaleString();
+      document.getElementById('currentMeta').textContent = mb + ' MB · uploaded ' + date;
+      document.getElementById('currentApk').style.display = 'block';
+    }
+
+    // ── Drag & drop + click to browse ──
     dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
     dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
     dropZone.addEventListener('drop', (e) => {
       e.preventDefault();
       dropZone.classList.remove('dragover');
-      if (e.dataTransfer.files[0]) selectFile(e.dataTransfer.files[0]);
+      if (e.dataTransfer.files[0]) uploadFile(e.dataTransfer.files[0]);
     });
     dropZone.addEventListener('click', () => fileInput.click());
-    fileInput.addEventListener('change', () => { if (fileInput.files[0]) selectFile(fileInput.files[0]); });
+    fileInput.addEventListener('change', () => { if (fileInput.files[0]) uploadFile(fileInput.files[0]); });
 
-    function selectFile(file) {
+    // ── Upload immediately on file selection ──
+    async function uploadFile(file) {
       if (!file.name.toLowerCase().endsWith('.apk')) {
-        showError('Please select a .apk file');
+        showError('Please select an .apk file');
         return;
       }
-      selectedFile = file;
-      fileNameEl.textContent = file.name;
-      fileSizeEl.textContent = formatSize(file.size);
-      fileInfo.style.display = 'block';
-      uploadBtn.style.display = 'block';
+
+      // UI: uploading state
+      dropZone.classList.add('uploading');
+      progressWrap.style.display = 'block';
+      progressText.style.display = 'block';
       errorMsg.style.display = 'none';
       result.style.display = 'none';
+      progressBar.style.width = '15%';
+      progressText.textContent = 'Uploading ' + file.name + '...';
+
+      try {
+        const sanitized = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+        const storagePath = Date.now() + '-' + sanitized;
+
+        progressBar.style.width = '30%';
+
+        const { error: uploadError } = await sb.storage
+          .from(BUCKET)
+          .upload(storagePath, file, {
+            contentType: 'application/vnd.android.package-archive',
+            upsert: false
+          });
+
+        if (uploadError) throw new Error(uploadError.message);
+
+        progressBar.style.width = '70%';
+        progressText.textContent = 'Saving...';
+
+        const { data: urlData } = sb.storage.from(BUCKET).getPublicUrl(storagePath);
+        const publicUrl = urlData.publicUrl;
+
+        // Save metadata to Supabase
+        const { error: dbError } = await sb.from('apk_uploads').insert({
+          original_name: file.name,
+          storage_path: storagePath,
+          file_size: file.size,
+          download_url: publicUrl
+        });
+
+        if (dbError) throw new Error(dbError.message);
+
+        progressBar.style.width = '100%';
+        progressText.textContent = 'Done!';
+
+        // Update current APK banner
+        showCurrentApk({
+          original_name: file.name,
+          file_size: file.size,
+          created_at: new Date().toISOString(),
+          download_url: publicUrl
+        });
+
+        // Show QR
+        await showQR(file.name, file.size, publicUrl);
+
+        // Hide progress after brief pause
+        setTimeout(() => {
+          progressWrap.style.display = 'none';
+          progressText.style.display = 'none';
+          progressBar.style.width = '0%';
+        }, 800);
+
+      } catch (e) {
+        showError('Upload failed: ' + e.message);
+        progressWrap.style.display = 'none';
+        progressText.style.display = 'none';
+      }
+
+      dropZone.classList.remove('uploading');
+      fileInput.value = '';
+    }
+
+    // ── Show QR code pointing to download page ──
+    async function showQR(filename, fileSize, directUrl) {
+      const mb = (fileSize / 1048576).toFixed(1);
+      document.getElementById('resultTitle').textContent = '✅ Ready to share';
+      document.getElementById('resultFileName').textContent = filename + ' · ' + mb + ' MB';
+      document.getElementById('linkInput').value = downloadPageUrl;
+
+      try {
+        await QRCode.toCanvas(document.getElementById('qrCanvas'), downloadPageUrl, {
+          width: 260,
+          margin: 2,
+          color: { dark: '#000000', light: '#ffffff' }
+        });
+      } catch (_) {
+        document.getElementById('qrWrap').style.display = 'none';
+      }
+
+      result.style.display = 'block';
+    }
+
+    // ── Copy link ──
+    document.getElementById('copyBtn').addEventListener('click', () => {
+      const input = document.getElementById('linkInput');
+      const btn = document.getElementById('copyBtn');
+      navigator.clipboard.writeText(input.value).then(() => {
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy', 1500);
+      });
+    });
+
+    // ── Replace APK ──
+    document.getElementById('replaceBtn').addEventListener('click', () => {
+      fileInput.click();
+    });
+
+    // ── Helpers ──
+    function showError(msg) {
+      errorMsg.textContent = msg;
+      errorMsg.style.display = 'block';
     }
 
     function formatSize(bytes) {
@@ -294,125 +440,6 @@
       if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
       return (bytes / 1048576).toFixed(1) + ' MB';
     }
-
-    function showError(msg) {
-      errorMsg.textContent = msg;
-      errorMsg.style.display = 'block';
-    }
-
-    // Upload directly to Supabase Storage
-    uploadBtn.addEventListener('click', async () => {
-      if (!selectedFile) return;
-
-      uploadBtn.disabled = true;
-      progressWrap.style.display = 'block';
-      progressText.style.display = 'block';
-      errorMsg.style.display = 'none';
-
-      progressBar.style.width = '20%';
-      progressText.textContent = 'Uploading to cloud...';
-
-      try {
-        const sanitized = selectedFile.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-        const storagePath = Date.now() + '-' + sanitized;
-
-        const { error: uploadError } = await sb.storage
-          .from(BUCKET)
-          .upload(storagePath, selectedFile, {
-            contentType: 'application/vnd.android.package-archive',
-            upsert: false
-          });
-
-        if (uploadError) {
-          showError('Upload failed: ' + uploadError.message);
-          uploadBtn.disabled = false;
-          progressWrap.style.display = 'none';
-          progressText.style.display = 'none';
-          return;
-        }
-
-        progressBar.style.width = '75%';
-        progressText.textContent = 'Getting download link...';
-
-        // Public URL from Supabase
-        const { data: urlData } = sb.storage
-          .from(BUCKET)
-          .getPublicUrl(storagePath);
-
-        const publicUrl = urlData.publicUrl;
-
-        // Save metadata
-        await sb.from('apk_uploads').insert({
-          original_name: selectedFile.name,
-          storage_path: storagePath,
-          file_size: selectedFile.size,
-          download_url: publicUrl
-        });
-
-        progressBar.style.width = '100%';
-        progressText.textContent = 'Upload complete!';
-
-        await showResult({
-          filename: selectedFile.name,
-          size: selectedFile.size,
-          downloadUrl: publicUrl
-        });
-
-      } catch (e) {
-        showError('Error: ' + e.message);
-        uploadBtn.disabled = false;
-      }
-    });
-
-    async function showResult(data) {
-      const base = window.location.href.replace(/\/[^/]*$/, '');
-      const pageLink = base + '/download.html?url=' + encodeURIComponent(data.downloadUrl)
-        + '&name=' + encodeURIComponent(data.filename)
-        + '&size=' + data.size;
-
-      document.getElementById('resultFileName').textContent = data.filename + ' (' + formatSize(data.size) + ')';
-      document.getElementById('linkInput').value = pageLink;
-      document.getElementById('directLinkInput').value = data.downloadUrl;
-
-      // QR code generated entirely client-side
-      try {
-        await QRCode.toCanvas(document.getElementById('qrCanvas'), data.downloadUrl, {
-          width: 240, margin: 2,
-          color: { dark: '#000000', light: '#ffffff' }
-        });
-      } catch {
-        document.getElementById('qrWrap').style.display = 'none';
-      }
-
-      result.style.display = 'block';
-    }
-
-    // Copy buttons
-    document.getElementById('copyBtn').addEventListener('click', () => copyText('linkInput', 'copyBtn'));
-    document.getElementById('copyDirectBtn').addEventListener('click', () => copyText('directLinkInput', 'copyDirectBtn'));
-
-    function copyText(inputId, btnId) {
-      const input = document.getElementById(inputId);
-      const btn = document.getElementById(btnId);
-      navigator.clipboard.writeText(input.value).then(() => {
-        btn.textContent = 'Copied!';
-        setTimeout(() => btn.textContent = 'Copy', 2000);
-      });
-    }
-
-    // Reset
-    document.getElementById('newUploadBtn').addEventListener('click', () => {
-      selectedFile = null;
-      fileInput.value = '';
-      fileInfo.style.display = 'none';
-      uploadBtn.style.display = 'none';
-      uploadBtn.disabled = false;
-      progressWrap.style.display = 'none';
-      progressText.style.display = 'none';
-      result.style.display = 'none';
-      errorMsg.style.display = 'none';
-      progressBar.style.width = '0%';
-    });
   </script>
 </body>
 </html>
