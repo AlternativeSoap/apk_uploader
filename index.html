@@ -145,7 +145,7 @@
       padding: 14px;
       display: inline-block;
     }
-    .result .qr-code canvas { display: block; }
+    .result .qr-code img { display: block; width: 260px; height: 260px; }
     .result .scan-hint {
       font-size: 0.88rem;
       color: #aaa;
@@ -246,7 +246,7 @@
       <p class="file-label" id="resultFileName"></p>
 
       <div class="qr-code" id="qrWrap">
-        <canvas id="qrCanvas"></canvas>
+        <img id="qrImage" alt="QR Code">
       </div>
       <p class="scan-hint">Scan to download &amp; install the APK</p>
 
@@ -260,7 +260,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
   <script src="config.js"></script>
   <script>
     const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -401,14 +401,28 @@
       document.getElementById('resultFileName').textContent = filename + ' · ' + mb + ' MB';
       document.getElementById('linkInput').value = downloadPageUrl;
 
-      try {
-        await QRCode.toCanvas(document.getElementById('qrCanvas'), downloadPageUrl, {
-          width: 260,
-          margin: 2,
-          color: { dark: '#000000', light: '#ffffff' }
-        });
-      } catch (_) {
-        document.getElementById('qrWrap').style.display = 'none';
+      const qrImg = document.getElementById('qrImage');
+      const qrWrap = document.getElementById('qrWrap');
+
+      // Try the QRCode library first
+      if (typeof QRCode !== 'undefined' && QRCode.toDataURL) {
+        try {
+          const dataUrl = await QRCode.toDataURL(downloadPageUrl, {
+            width: 260,
+            margin: 2,
+            color: { dark: '#000000', light: '#ffffff' }
+          });
+          qrImg.src = dataUrl;
+          qrWrap.style.display = 'inline-block';
+        } catch (_) {
+          // Fallback to Google Charts API
+          qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=' + encodeURIComponent(downloadPageUrl);
+          qrWrap.style.display = 'inline-block';
+        }
+      } else {
+        // Library didn't load — use QR server API
+        qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=' + encodeURIComponent(downloadPageUrl);
+        qrWrap.style.display = 'inline-block';
       }
 
       result.style.display = 'block';
