@@ -278,22 +278,47 @@
     // The download page URL (always the same — it fetches the latest APK)
     const downloadPageUrl = window.location.href.replace(/\/[^/]*$/, '') + '/download.html';
 
-    // ── On page load: check if there's already an APK ──
+    // ── On page load: verify Supabase, then check for current APK ──
     (async function init() {
       loadingSpinner.style.display = 'block';
+
+      if (!SUPABASE_URL || !SUPABASE_ANON_KEY ||
+          SUPABASE_URL.includes('your-project') ||
+          SUPABASE_ANON_KEY.includes('your-anon-key')) {
+        loadingSpinner.style.display = 'none';
+        showError(
+          'Supabase is not configured. Edit config.js with your Project URL and anon key ' +
+          '(Dashboard → Settings → API), then push to GitHub or refresh this page.'
+        );
+        return;
+      }
+
       try {
         const { data, error } = await sb
           .from('apk_uploads')
           .select('original_name, file_size, created_at, download_url')
           .order('created_at', { ascending: false })
           .limit(1)
-          .single();
+          .maybeSingle();
 
-        if (data && !error) {
+        if (error) {
+          if (isNetworkError(error.message)) {
+            showError(supabaseUnreachableMessage());
+          } else if (error.code === 'PGRST205' || error.message.includes('apk_uploads')) {
+            showError(
+              'Database table missing. Run supabase.sql in Supabase Dashboard → SQL Editor, then try again.'
+            );
+          }
+        } else if (data) {
           showCurrentApk(data);
           await showQR(data.original_name, data.file_size, data.download_url);
         }
-      } catch (_) { /* no current APK — that's fine */ }
+      } catch (e) {
+        if (isNetworkError(e.message)) {
+          showError(supabaseUnreachableMessage());
+        }
+      }
+
       loadingSpinner.style.display = 'none';
     })();
 
@@ -385,7 +410,7 @@
         }, 800);
 
       } catch (e) {
-        showError('Upload failed: ' + e.message);
+        showError('Upload failed: ' + formatUploadError(e));
         progressWrap.style.display = 'none';
         progressText.style.display = 'none';
       }
@@ -444,6 +469,28 @@
     });
 
     // ── Helpers ──
+    function isNetworkError(msg) {
+      return msg === 'Failed to fetch' ||
+        msg === 'NetworkError when attempting to fetch resource.' ||
+        msg === 'Load failed';
+    }
+
+    function supabaseUnreachableMessage() {
+      return (
+        'Cannot reach Supabase at ' + SUPABASE_URL + '. ' +
+        'Open Supabase Dashboard → confirm the project is active → copy Settings → API ' +
+        '(Project URL + anon key) into config.js → run supabase.sql → push to GitHub.'
+      );
+    }
+
+    function formatUploadError(e) {
+      const msg = e && e.message ? e.message : String(e);
+      if (isNetworkError(msg)) return supabaseUnreachableMessage();
+      if (msg.includes('row-level security') || msg.includes('403'))
+        return msg + ' — run supabase.sql in Supabase SQL Editor (storage + table policies).';
+      return msg;
+    }
+
     function showError(msg) {
       errorMsg.textContent = msg;
       errorMsg.style.display = 'block';

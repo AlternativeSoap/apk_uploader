@@ -22,51 +22,34 @@ The QR code URL never changes. It always fetches the latest APK from Supabase.
 
 ### 1. Run SQL in Supabase
 
-Go to **Supabase Dashboard → SQL Editor → New Query** and run:
+Go to **Supabase Dashboard → SQL Editor → New Query**, open [`supabase.sql`](supabase.sql) from this repo, paste the full file, and **Run**.
 
-```sql
-INSERT INTO storage.buckets (id, name, public)
-VALUES ('apk-uploads', 'apk-uploads', true)
-ON CONFLICT (id) DO NOTHING;
-
-CREATE TABLE IF NOT EXISTS apk_uploads (
-  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-  original_name text NOT NULL,
-  storage_path text NOT NULL,
-  file_size bigint NOT NULL,
-  download_url text NOT NULL,
-  created_at timestamptz DEFAULT now()
-);
-
-ALTER TABLE apk_uploads ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Public read access" ON apk_uploads
-  FOR SELECT USING (true);
-
-CREATE POLICY "Service role insert" ON apk_uploads
-  FOR INSERT WITH CHECK (true);
-
-CREATE POLICY "Public APK download" ON storage.objects
-  FOR SELECT TO public
-  USING (bucket_id = 'apk-uploads');
-
-CREATE POLICY "Allow APK upload" ON storage.objects
-  FOR INSERT TO public
-  WITH CHECK (bucket_id = 'apk-uploads');
-```
+That creates the `apk-uploads` bucket, `apk_uploads` table, grants, and RLS policies in one step.
 
 ### 2. Configure `config.js`
 
 Edit `config.js` with your Supabase project URL and **anon** (public) key from **Dashboard → Settings → API**:
 
 ```js
-const SUPABASE_URL = 'https://your-project.supabase.co';
+const SUPABASE_URL = 'https://YOUR-PROJECT-REF.supabase.co';
 const SUPABASE_ANON_KEY = 'your-anon-key-here';
 ```
 
-### 3. Enable GitHub Pages
+**Important:** The URL must match an **active** project. If uploads show `Failed to fetch`, the project may be paused, deleted, or the URL in `config.js` is wrong — fix credentials in the dashboard, not by redeploying GitHub Pages alone.
 
-Go to **repo Settings → Pages → Source: Deploy from a branch → Branch: `main` / `/ (root)`** → Save.
+### 3. Push to GitHub (GitHub Pages)
+
+Commit `config.js` (with your real keys) and push to `main`. Pages deploys automatically from the root.
+
+Go to **repo Settings → Pages → Source: Deploy from a branch → Branch: `main` / `/ (root)`** if not already enabled.
+
+## Troubleshooting
+
+| Symptom | Fix |
+|--------|-----|
+| `Failed to fetch` on upload | Supabase URL unreachable — create/restore project, update `config.js`, run `supabase.sql`, push |
+| `permission denied` / RLS error | Re-run `supabase.sql` (grants + policies) |
+| `table apk_uploads` not found | Run `supabase.sql` in SQL Editor |
 
 ## Files
 
@@ -75,3 +58,4 @@ Go to **repo Settings → Pages → Source: Deploy from a branch → Branch: `ma
 | `index.html` | Upload page — drop APK, auto-uploads, shows QR code |
 | `download.html` | Download page — fetches latest APK from Supabase, auto-downloads |
 | `config.js` | Your Supabase URL + anon key (edit this) |
+| `supabase.sql` | One-shot database + storage setup for SQL Editor |
